@@ -21,8 +21,8 @@ We use the following list of custom/public dataset for benchmarking:
 * nyu-depthv2-mini: randomly selected 20% of publically available NYU-DepthV2 dataset
 
 The download links for these dataset are as follows:
-* cifar-mnist:
-* nyu-depthv2-mini:
+* cifar-mnist: https://drive.google.com/file/d/1X9mbPvpDX4Vo8PABGDFKnbd6V9wWzk5A/view?usp=share_link
+* nyu-depthv2-mini: unpublished
 
 The dataset structure shall be:
 - dataset
