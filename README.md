@@ -22,7 +22,7 @@ We use the following list of custom/public dataset for benchmarking:
 
 The download links for these dataset are as follows:
 * cifar-mnist: https://drive.google.com/file/d/1X9mbPvpDX4Vo8PABGDFKnbd6V9wWzk5A/view?usp=share_link
-* nyu-depthv2-mini: unpublished
+* nyu-depthv2-mini: https://drive.google.com/file/d/1SG3_6jsFejmwJQLD2gBctiwu3IxoS0JC/view?usp=share_link
 
 The dataset structure shall be:
 - dataset
