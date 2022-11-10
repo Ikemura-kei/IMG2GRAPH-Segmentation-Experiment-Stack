@@ -1,0 +1,35 @@
+---
+
+batch_size: 2
+
+dataset: "cifar_mnist"
+
+root_dir: "/data1/kikemura/IMG2GRAPH_Segmentation_Experiment"
+
+experiment_name: "experiment"
+
+model_save_dir: "saved_weights"
+
+result_save_dir: "results"
+
+val_image_size: [70, 70]
+
+train_image_size: [70, 70]
+
+graph_gen_model: "scg-net"
+
+print_freq: 10
+
+save_freq: 1
+
+val_freq: 25
+
+device: "cuda"
+
+num_nodes: [50, 50]
+
+learning_rate: 0.001
+
+save_pred: false
+
+gnn: "sage"

@@ -1,20 +1,17 @@
 import torch
 import torch.nn as nn
-from .pretrained_resnet50 import *
 from .scg_block import *
 from .gcn_layer import *
 import torch.nn.functional as F
 from pretrainedmodels import se_resnext50_32x4d, se_resnext101_32x4d
 
 import ssl
-ssl._create_default_https_context = ssl._create_unverified_context
+ssl._create_default_https_context = ssl._create_unverified_context # needed when downloading pretrained weights
 
 class SCG_Net(nn.Module):
 
-    def __init__(self, nb_nodes, nb_classes, dropout=0.2):
+    def __init__(self, nb_nodes, nb_classes, gnn, dropout=0.2):
         super(SCG_Net, self).__init__()
-
-        self.pretrained_resnet50 = PretrainedWideResnet50()
 
         resnet = se_resnext50_32x4d()
         self.layer0, self.layer1, self.layer2, self.layer3, = \
@@ -36,10 +33,12 @@ class SCG_Net(nn.Module):
         self.node_size = nb_nodes
 
         self.training = True
+        
+        self.gnn = gnn
 
-        self.graph_layers1 = GCN_Layer(1024, out_features=128, bnorm=True, activation=nn.ReLU(True), dropout=dropout)
+        # self.graph_layers1 = GCN_Layer(1024, out_features=128, bnorm=True, activation=nn.ReLU(True), dropout=dropout)
 
-        self.graph_layers2 = GCN_Layer(128, out_features=nb_classes, bnorm=False, activation=None)
+        # self.graph_layers2 = GCN_Layer(128, out_features=nb_classes, bnorm=False, activation=None)
 
         self.num_out_channels = nb_classes
 
@@ -64,9 +63,10 @@ class SCG_Net(nn.Module):
         # print("gx view:",gx.view(B, -1, C).size())
         # print("gx size after gnn:", gx.size())
 
-        gx, _= self.graph_layers2(self.graph_layers1((gx.view((B, -1, C)), A)))
+        # gx, _= self.graph_layers2(self.graph_layers1((gx.view((B, -1, C)), A)))
+        gx, _ = self.gnn((gx.view((B, -1, C)), A))
 
-        gx += z_hat
+        gx = gx + z_hat
 
         gx = gx.view(gx.size()[0], self.num_out_channels, self.node_size[0], self.node_size[1])
 

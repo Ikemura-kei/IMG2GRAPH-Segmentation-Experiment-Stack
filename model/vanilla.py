@@ -3,17 +3,17 @@ import torch.nn as nn
 import numpy as np
 
 class Vanilla(nn.Module):
-    def __init__(self, scale=8):
+    def __init__(self, num_classes, gnn, nodes):
         super(Vanilla, self).__init__()
 
-        self.scale = scale
+        self.num_nodes = nodes[0] * nodes[1]
+        self.nodes = nodes
 
     def forward(self, data):
         B, C, H, W = data.size()
 
-        num_nodes = H / self.scale * W / self.scale
-
-        A = torch.zeros((B, int(num_nodes), int(num_nodes)))
+        A = torch.zeros((B, int(self.num_nodes), int(self.num_nodes)))
+        self.scale = int(W / nodes[0])
 
         for b in range(B):
             for x in range(int(W / self.scale)):

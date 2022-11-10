@@ -7,12 +7,13 @@ import numpy as np
 import cv2
 import natsort 
 
-from dataloader.dataset import NYUDepthV2Dataset
+from dataloader.nyu_depthv2_mini import NYUDepthV2Mini
 from dataloader.cifar_mnist import CifarMnist
 from model.create_model import SegmentationGNN
 from loss.acw_loss import ACW_loss
 from optimizer.lookahead import Lookahead
 from config.experiment_config import ExperimentConfig
+from config.experiment_config import *
 from utils.visualization_utils import visualize_seg_map
 from utils.visualization_utils import test_dataset
 
@@ -94,7 +95,7 @@ def train(model, train_loader, val_loader, optimizer, loss_func, exp_config, lr_
                     avg_loss += loss.item()
                     counter += 1
 
-                    if i == 0: # save the first result for visualization
+                    if i == 0 and exp_config.save_pred: # save the first result for visualization
                         seg_map = np.argmax(out[0].detach().cpu().numpy(), axis=0)
                         save_img = visualize_seg_map(seg_map)
                         cv2.imwrite(os.path.join(exp_config.result_img_path, "pred"+str(cur_epoch)+".jpg"), save_img)
@@ -109,34 +110,51 @@ def train(model, train_loader, val_loader, optimizer, loss_func, exp_config, lr_
 
 def main():
     exp_config = ExperimentConfig(graph_gen_net="scg-net")
-    exp_config.train_img_size = (64, 64)
-    exp_config.val_img_size = (64, 64)
-    exp_config.train_batch = 16
-    exp_config.root_dir = "/data1/kikemura/IMG2GRAPH_Segmentation_Experiment"
-    exp_config.print_freq = 10
-    exp_config.val_freq = 15
-    exp_config.save_freq = 25
-    exp_config.model_save_path = "/data1/kikemura/IMG2GRAPH_Segmentation_Experiment/saved_weights/" + exp_config.experiment_name
-    exp_config.result_img_path = "/data1/kikemura/IMG2GRAPH_Segmentation_Experiment/results/" + exp_config.experiment_name
-    exp_config.device = "cuda"
-    exp_config.nb_classes = 10
 
+    config = load_config("./config/config.yaml")
+    print(config)
+
+    exp_config.train_img_size = config["train_image_size"]
+    exp_config.val_img_size = config["val_image_size"]
+    exp_config.train_batch = config["batch_size"]
+    exp_config.root_dir = config["root_dir"]
+    exp_config.print_freq = config["print_freq"]
+    exp_config.val_freq = config["val_freq"]
+    exp_config.save_freq = config["save_freq"]
+    exp_config.graph_gen_net = config["graph_gen_model"]
+    exp_config.gnn = config["gnn"]
+    exp_config.experiment_name = config["experiment_name"] + "_" + exp_config.gnn + "_" + exp_config.graph_gen_net
+    exp_config.model_save_path = os.path.join(exp_config.root_dir, config["model_save_dir"], exp_config.experiment_name)
+    exp_config.result_img_path = os.path.join(exp_config.root_dir, config["result_save_dir"], exp_config.experiment_name)
+    exp_config.device = config["device"]
+    exp_config.dataset = config["dataset"]
+    exp_config.num_nodes = config["num_nodes"]
+    exp_config.save_pred = config["save_pred"]
+    exp_config.lr = config["learning_rate"]
+
+    print("creating directory %s" % (exp_config.model_save_path))
+    print("creating directory %s" % (exp_config.result_img_path))
     os.makedirs(exp_config.model_save_path, exist_ok=True) 
     os.makedirs(exp_config.result_img_path, exist_ok=True) 
 
-    transform = transforms.Compose([transforms.Resize(exp_config.train_img_size), transforms.ToTensor()])
-    if exp_config.dataset == "cifar_mnist":
-        train_data = CifarMnist(os.path.join(exp_config.root_dir, exp_config.dataset_dir, exp_config.dataset, exp_config.train_data_dir), exp_config.train_img_size, transform)
-    train_loader = DataLoader(train_data, batch_size=exp_config.train_batch, shuffle=True)
+    transform_train = transforms.Compose([transforms.Resize(exp_config.train_img_size), transforms.ToTensor()])
+    transform_val = transforms.Compose([transforms.Resize(exp_config.val_img_size), transforms.ToTensor()])
 
-    transform = transforms.Compose([transforms.Resize(exp_config.val_img_size), transforms.ToTensor()])
     if exp_config.dataset == "cifar_mnist":
-        val_data = CifarMnist(os.path.join(exp_config.root_dir, exp_config.dataset_dir, exp_config.dataset, exp_config.val_data_dir), exp_config.val_img_size, transform)
-    val_loader = DataLoader(val_data, batch_size=exp_config.val_batch, shuffle=True)
+        exp_config.nb_classes = 10
+        train_data = CifarMnist(os.path.join(exp_config.root_dir, exp_config.dataset_dir, exp_config.dataset, exp_config.train_data_dir), exp_config.train_img_size, transform_train)
+        val_data = CifarMnist(os.path.join(exp_config.root_dir, exp_config.dataset_dir, exp_config.dataset, exp_config.val_data_dir), exp_config.val_img_size, transform_val)
+    else if exp_config.dataset == "nyu_depthv2_mini":
+        exp_config.nb_classes = 894
+        train_data = NYUDepthV2Mini(os.path.join(exp_config.root_dir, exp_config.dataset_dir, exp_config.dataset, exp_config.train_data_dir), exp_config.train_img_size, transform_train)
+        val_data = NYUDepthV2Mini(os.path.join(exp_config.root_dir, exp_config.dataset_dir, exp_config.dataset, exp_config.val_data_dir), exp_config.val_img_size, transform_val)
+    
+    train_loader = DataLoader(train_data, batch_size=exp_config.train_batch, shuffle=True)
+    val_loader = DataLoader(val_data, batch_size=1, shuffle=True)
     
     test_dataset(train_loader)
 
-    model = SegmentationGNN(graph_gen_net=exp_config.graph_gen_net, num_classes=exp_config.nb_classes, nb_nodes=(50, 50))
+    model = SegmentationGNN(graph_gen_net=exp_config.graph_gen_net, num_classes=exp_config.nb_classes, nb_nodes=exp_config.num_nodes, gnn=exp_config.gnn)
     model.to(exp_config.device)
 
     loss_func = ACW_loss()

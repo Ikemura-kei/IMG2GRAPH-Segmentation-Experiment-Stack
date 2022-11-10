@@ -2,3 +2,5 @@ natsort
 opencv-python
 pretrainedmodels
 matplotlib
+Pillow
+torch_geometric

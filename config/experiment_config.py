@@ -32,7 +32,6 @@ class ExperimentConfig(object):
     momentum = 0.9
 
     # check point parameters
-    snapshot = ''
     print_freq = 100
     save_pred = False
     save_rate = 0.1
@@ -47,9 +46,24 @@ class ExperimentConfig(object):
     result_img_path = ""
     val_freq = 1
 
+    num_nodes = (10, 10)
+
     device = "cpu"
 
     dataset = "cifar_mnist"
 
+    gnn = ""
+
     def __init__(self, graph_gen_net):
         self.graph_gen_net = graph_gen_net
+
+
+import yaml
+
+def load_config(config_file):
+    with open(config_file, "r") as stream:
+        try:
+            ret = yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+            print(exc)
+    return ret
