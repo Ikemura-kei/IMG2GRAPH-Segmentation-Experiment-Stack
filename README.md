@@ -24,6 +24,16 @@ The download links for these dataset are as follows:
 * cifar-mnist:
 * nyu-depthv2-mini:
 
+The dataset structure shall be:
+- dataset
+  - cifar_mnist
+    - test
+      - rgb
+      - seg_map
+    - train
+      - rgb
+      - seg_map
+
 # Train
 ## Configuration
 You will need to put your configurations in `config/config.yaml`
