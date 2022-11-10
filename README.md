@@ -54,3 +54,7 @@ python train.py
 ```
 
 > Note: currently only support single GPU training, we will make it distributed over multiple GPU in the future.
+
+
+# Adding New Models
+You can feel free to add any segmentation networks that incorporates graphs generated from images and/or new GNN layers for more variety in choices of experiment components.

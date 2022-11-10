@@ -32,4 +32,4 @@ learning_rate: 0.001
 
 save_pred: false
 
-gnn: "sage"
+gnn: "gcn"
