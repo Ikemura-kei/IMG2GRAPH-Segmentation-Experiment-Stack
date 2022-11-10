@@ -1,0 +1,4 @@
+natsort
+opencv-python
+pretrainedmodels
+matplotlib
