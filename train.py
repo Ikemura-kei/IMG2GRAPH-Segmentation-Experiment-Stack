@@ -144,7 +144,7 @@ def main():
         exp_config.nb_classes = 10
         train_data = CifarMnist(os.path.join(exp_config.root_dir, exp_config.dataset_dir, exp_config.dataset, exp_config.train_data_dir), exp_config.train_img_size, transform_train)
         val_data = CifarMnist(os.path.join(exp_config.root_dir, exp_config.dataset_dir, exp_config.dataset, exp_config.val_data_dir), exp_config.val_img_size, transform_val)
-    else if exp_config.dataset == "nyu_depthv2_mini":
+    elif exp_config.dataset == "nyu_depthv2_mini":
         exp_config.nb_classes = 894
         train_data = NYUDepthV2Mini(os.path.join(exp_config.root_dir, exp_config.dataset_dir, exp_config.dataset, exp_config.train_data_dir), exp_config.train_img_size, transform_train)
         val_data = NYUDepthV2Mini(os.path.join(exp_config.root_dir, exp_config.dataset_dir, exp_config.dataset, exp_config.val_data_dir), exp_config.val_img_size, transform_val)
