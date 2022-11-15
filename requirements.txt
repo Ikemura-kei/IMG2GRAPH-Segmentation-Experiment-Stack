@@ -3,4 +3,6 @@ opencv-python
 pretrainedmodels
 matplotlib
 Pillow
-torch_geometric
+scikit-image
+pyyaml
+tensorboard

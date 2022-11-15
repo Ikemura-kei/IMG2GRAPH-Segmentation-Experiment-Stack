@@ -37,6 +37,7 @@ class CifarMnist(Dataset):
         label = np.load(self.seg_map_paths[index])
         label = cv.resize(label, self.image_size, interpolation=cv.INTER_NEAREST)
         label = torch.from_numpy(label)
+        print(label)
 
         return rgb, label
 

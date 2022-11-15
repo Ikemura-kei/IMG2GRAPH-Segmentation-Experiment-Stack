@@ -5,13 +5,15 @@ from .gcn_layer import *
 from .vanilla import *
 from .sage import *
 from .cheb import *
+from .agnn import *
+from .gin import *
 
 class SegmentationGNN(nn.Module):
 
     def __init__(self, graph_gen_net, num_classes, nb_nodes, gnn, dropout=0.2):
         # constant definition, when new graph generation networks are added, update the definition here
         AVAILABLE_GRAPH_GEN_NETS = ["scg-net", 'graph-fcn', "3d-graph", "vanilla"]
-        AVAILABLE_GNN = ["gcn", 'sage', "cheb"]
+        AVAILABLE_GNN = ["gcn", 'sage', "cheb", "agnn", "gin"]
 
         super(SegmentationGNN, self).__init__()
 
@@ -29,9 +31,17 @@ class SegmentationGNN(nn.Module):
             print("using", AVAILABLE_GNN[1])
             self.gnn = TwoLayerSAGE(1024, 16, num_classes)
 
-        if gnn == AVAILABLE_GNN[2]: # sage
+        if gnn == AVAILABLE_GNN[2]: # cheb
             print("using", AVAILABLE_GNN[2])
             self.gnn = TwoLayerCheb(1024, 16, num_classes)
+
+        if gnn == AVAILABLE_GNN[3]: # agnn
+            print("using", AVAILABLE_GNN[3])
+            self.gnn = AGNN(1024, 16, num_classes, 3, 0.5)
+        
+        if gnn == AVAILABLE_GNN[4]: # gin
+            print("using", AVAILABLE_GNN[4])
+            self.gnn = GIN(1024, 2, 16, num_classes)
 
         if graph_gen_net == AVAILABLE_GRAPH_GEN_NETS[0] or graph_gen_model == "": # scg-net
             print("using", AVAILABLE_GRAPH_GEN_NETS[0])

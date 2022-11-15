@@ -70,7 +70,7 @@ class SCG_Net(nn.Module):
 
         gx = gx.view(gx.size()[0], self.num_out_channels, self.node_size[0], self.node_size[1])
 
-        # gx = F.interpolate(gx, (H, W), mode='bilinear', align_corners=False)
+        gx = F.interpolate(gx, (H, W), mode='bilinear', align_corners=False)
 
         if self.training:
             return F.interpolate(gx, x_size[2:], mode='bilinear', align_corners=False), loss
