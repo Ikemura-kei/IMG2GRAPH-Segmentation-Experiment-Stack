@@ -38,8 +38,11 @@ The dataset structure shall be:
 ## Configuration
 You will need to put your configurations in `config/config.yaml`
 
+- gnn: the type of gnn layer used, should be one of __{"gcn", "cheb", "sage", "gin", "agnn"}__
+- graph_gen_model: the model for generating graphs out of images, should be one of __{"vanilla", "scg-net", "graph-fcn"}__
+- dataset: one of __{"cifar_mnist", "nyu_depthv2_mini", "voc_mini"}__
+
 - batch_size: should be an integer being at least 1, be careful of GPU RAM overflow if this is set too large
-- dataset: one of __{"cifar_mnist", "nyu_depthv2_mini"}__
 - root_dir: your project root dir, should be .../IMG2GRAPH_Segmentation_Experiment_Stack where ... is where you put this project into.
 - experiment_name: the unique identifier you give to everything saved for this experiment, folders named by this will be created for different saving purposes.
 - model_save_dir: a folder to save your checkpoints. They will be saved under `root_dir/model_save_dir/experiment_name/`
@@ -47,14 +50,13 @@ You will need to put your configurations in `config/config.yaml`
 - result_save_dir: a folder to save your groundtruth and prediction pairs during training. They will be saved under `root_dir/result_save_dir/experiment_name/`, will be ignored if `save_pred` is `False`.
 - val_image_size: the size of image used for validation, should be at least (32, 32). A recommended size is (64, 64).
 - train_image_size: the size of image used for training, should be at least (32, 32). A recommended size is (64, 64).
-- graph_gen_model: the model for generating graphs out of images, should be one of __{"vanilla", "scg-net", "graph-fcn"}__
 - print_freq: number of epochs to print training status, including loss, learning rate, etc.
 - save_freq: number of epochs to save a checkpoint.
 - val_freq: number of epochs to perform validation, results will be saved to `root_dir/result_save_dir/experiment_name/`.
 - device: if you somehow happens to prefer using CPUs (though not recommended), you can set here.
 - num_nodes: the number of nodes in the graph, this will affect the resolution of the prediction as we model each node as a pixel.
 - learning_rate: training learning rate
-- gnn: the type of gnn layer used, should be one of __{"gcn", "cheb", "sage"}__
+
 
 ## Run
 After making sure the configurations are what you want, run the following command
